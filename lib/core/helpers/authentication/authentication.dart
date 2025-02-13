@@ -4,9 +4,10 @@ abstract class Authentication {
   Future<bool> get canAuthenticateWithBiometrics;
   Future<bool> get isBiometricEnabled;
 
-  Future<void> authenticate(String username, String password);
-  Future<({String username, String password})> getCredential();
+  Future<void> saveCaches(String username);
+  Future<void> removeAllCaches();
 
+  Future<({String username, String password})> getCredential();
   Future<List<BiometricType>> getAvailableBiometrics();
   Future<bool> authenticateWithBiometric(String localizedReason);
   Future<void> enabledBiometricLogin(String password);

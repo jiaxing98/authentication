@@ -1,4 +1,4 @@
-import 'package:authentication/rsa_encryption.dart';
+import 'package:authentication/core/helpers/encryption/rsa_encryption.dart';
 import 'package:encrypt/encrypt.dart';
 import 'package:pointycastle/asymmetric/api.dart';
 

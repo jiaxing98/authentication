@@ -1,7 +1,8 @@
-import 'package:authentication/aes_encryption.dart';
-import 'package:authentication/aes_encryption_impl.dart';
-import 'package:authentication/authentication.dart';
-import 'package:authentication/authentication_exception.dart';
+import 'package:authentication/core/exceptions/authentication_exception.dart';
+import 'package:authentication/core/extensions/string_extension.dart';
+import 'package:authentication/core/helpers/authentication/authentication.dart';
+import 'package:authentication/core/helpers/encryption/aes_encryption.dart';
+import 'package:authentication/core/helpers/encryption/aes_encryption_impl.dart';
 import 'package:authentication/env.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
@@ -38,10 +39,16 @@ class AuthenticationImpl extends Authentication {
   }
 
   @override
-  Future<void> authenticate(String username, String password) async {
-    // ! authenticate user
+  Future<void> saveCaches(String username) async {
     final encrypted = _aes.encrypt(username);
     await _sp.setString(_biometricLoginUsername, encrypted);
+  }
+
+  @override
+  Future<void> removeAllCaches() async {
+    await _sp.remove(_biometricLoginUsername);
+    await _sp.remove(_biometricLoginPassword);
+    await _sp.remove(_biometricLoginEnabled);
   }
 
   @override
@@ -50,15 +57,12 @@ class AuthenticationImpl extends Authentication {
     final encryptedPassword = _sp.getString(_biometricLoginPassword);
 
     // ! use string extensions
-    if (encryptedUsername == null ||
-        encryptedUsername.isEmpty ||
-        encryptedPassword == null ||
-        encryptedPassword.isEmpty) {
+    if (encryptedUsername.isNullOrEmpty || encryptedPassword.isNullOrEmpty) {
       throw CredentialNotFoundException();
     }
 
-    final username = _aes.decrypt(encryptedUsername);
-    final password = _aes.decrypt(encryptedPassword);
+    final username = _aes.decrypt(encryptedUsername!);
+    final password = _aes.decrypt(encryptedPassword!);
 
     return (username: username, password: password);
   }
