@@ -1,11 +1,12 @@
-import 'package:authentication/presentation/home_page.dart';
-import 'package:authentication/presentation/landing/blocs/onboarding_bloc.dart';
-import 'package:authentication/presentation/landing/formz/inputs/password_input.dart';
-import 'package:authentication/presentation/landing/formz/inputs/username_input.dart';
-import 'package:authentication/presentation/landing/formz/states/onboarding_formz_state.dart';
-import 'package:authentication/presentation/landing/widgets/onboarding_text.dart';
+import 'package:authentication/presentation/onboarding/blocs/onboarding_bloc.dart';
+import 'package:authentication/presentation/onboarding/formz/inputs/password_input.dart';
+import 'package:authentication/presentation/onboarding/formz/inputs/username_input.dart';
+import 'package:authentication/presentation/onboarding/formz/states/onboarding_formz_state.dart';
+import 'package:authentication/presentation/onboarding/widgets/onboarding_text.dart';
+import 'package:authentication/router/router.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 class LoginForm extends StatefulWidget {
@@ -23,6 +24,7 @@ class _LoginFormState extends State<LoginForm> {
   late final TextEditingController _usernameCtrl;
   late final TextEditingController _passwordCtrl;
 
+  bool isBiometricEnabled = false;
   bool hidePassword = true;
 
   @override
@@ -87,18 +89,38 @@ class _LoginFormState extends State<LoginForm> {
                   _formzState = _formzState.copyWith(password: PasswordInput.dirty(text)),
               validator: (value) => _formzState.password.validator(value ?? '')?.text(),
             ),
-            FilledButton(
-              onPressed: () async {
-                if (!_formKey.currentState!.validate()) return;
+            BlocBuilder<OnboardingBloc, OnboardingState>(
+              buildWhen: (prev, cur) =>
+                  cur is OnboardingInitial || cur is OnboardingCredentialCorrupted,
+              builder: (context, state) {
+                return Row(
+                  spacing: 16.0,
+                  children: [
+                    Expanded(
+                      child: FilledButton(
+                        onPressed: () async {
+                          if (!_formKey.currentState!.validate()) return;
 
-                context.read<OnboardingBloc>().add(
-                      OnboardingLoginAccount(
-                        username: _formzState.username.value,
-                        password: _formzState.password.value,
+                          context.read<OnboardingBloc>().add(
+                                OnboardingLoginAccount(
+                                  username: _formzState.username.value,
+                                  password: _formzState.password.value,
+                                ),
+                              );
+                        },
+                        child: Text("Login"),
                       ),
-                    );
+                    ),
+                    if (state is OnboardingInitial && state.isBiometricEnabled)
+                      IconButton.outlined(
+                        onPressed: () {
+                          context.read<OnboardingBloc>().add(OnboardingAuthenticateWithBiometric());
+                        },
+                        icon: Icon(Icons.fingerprint),
+                      ),
+                  ],
+                );
               },
-              child: Text("Login"),
             ),
             OnboardingText(
               description: "Don't have an account yet?",
@@ -119,11 +141,9 @@ class _LoginFormState extends State<LoginForm> {
         context.loaderOverlay.show();
       case OnboardingLoginSuccess():
         context.loaderOverlay.hide();
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-            builder: (ctx) => HomePage(title: "Flutter Authentication Demo"),
-          ),
+        context.pushReplacementNamed(
+          Routes.home,
+          queryParameters: {"username": state.username},
         );
       case OnboardingAskIfEnableBiometricAuth():
         context.loaderOverlay.hide();
@@ -137,33 +157,56 @@ class _LoginFormState extends State<LoginForm> {
               FilledButton(
                 onPressed: () {
                   context.read<OnboardingBloc>().add(
-                        OnboardingSetupBiometricLogin(password: _formzState.password.value),
+                        OnboardingSetupBiometricLogin(
+                          username: _formzState.username.value,
+                          password: _formzState.password.value,
+                        ),
                       );
-                  Navigator.pop(ctx);
+                  context.pop();
                 },
                 child: Text("OKAY"),
               ),
               OutlinedButton(
                 onPressed: () {
-                  Navigator.pop(ctx);
+                  context.pop();
+                  context.pushReplacementNamed(
+                    Routes.home,
+                    queryParameters: {"username": _formzState.username.value},
+                  );
                 },
                 child: Text("CANCEL"),
               )
             ],
           ),
         );
-
-      case OnboardingCredentialNotFound():
+      case OnboardingLoginFailure():
+        context.loaderOverlay.hide();
+        await showDialog(
+          context: context,
+          builder: (ctx) => AlertDialog(
+            title: Text("Failed to Login"),
+            content: Text("Wrong username or password. Or perhaps you have not sign up yet."),
+            actions: [
+              OutlinedButton(
+                onPressed: () {
+                  context.pop();
+                },
+                child: Text("OKAY"),
+              )
+            ],
+          ),
+        );
+      case OnboardingCredentialCorrupted():
         context.loaderOverlay.hide();
         showDialog(
           context: context,
           builder: (ctx) => AlertDialog(
-            title: Text("User Not Found!"),
-            content: Text("Did you key in the right username and password?"),
+            title: Text("Invalid Credential Found"),
+            content: Text("Please re-enter your username and password to login."),
             actions: [
               OutlinedButton(
                 onPressed: () {
-                  Navigator.pop(ctx);
+                  context.pop();
                 },
                 child: Text("OKAY"),
               )
@@ -180,7 +223,7 @@ class _LoginFormState extends State<LoginForm> {
             actions: [
               OutlinedButton(
                 onPressed: () {
-                  Navigator.pop(ctx);
+                  context.pop();
                 },
                 child: Text("OKAY"),
               )

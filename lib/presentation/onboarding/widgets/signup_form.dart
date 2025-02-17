@@ -1,10 +1,11 @@
-import 'package:authentication/presentation/landing/blocs/onboarding_bloc.dart';
-import 'package:authentication/presentation/landing/formz/inputs/password_input.dart';
-import 'package:authentication/presentation/landing/formz/inputs/username_input.dart';
-import 'package:authentication/presentation/landing/formz/states/onboarding_formz_state.dart';
-import 'package:authentication/presentation/landing/widgets/onboarding_text.dart';
+import 'package:authentication/presentation/onboarding/blocs/onboarding_bloc.dart';
+import 'package:authentication/presentation/onboarding/formz/inputs/password_input.dart';
+import 'package:authentication/presentation/onboarding/formz/inputs/username_input.dart';
+import 'package:authentication/presentation/onboarding/formz/states/onboarding_formz_state.dart';
+import 'package:authentication/presentation/onboarding/widgets/onboarding_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:loader_overlay/loader_overlay.dart';
 
 class SignUpForm extends StatefulWidget {
@@ -126,7 +127,7 @@ class _SignUpFormState extends State<SignUpForm> {
             actions: [
               FilledButton(
                 onPressed: () {
-                  Navigator.pop(ctx);
+                  context.pop();
                 },
                 child: Text("OKAY"),
               )
@@ -144,7 +145,7 @@ class _SignUpFormState extends State<SignUpForm> {
             actions: [
               OutlinedButton(
                 onPressed: () {
-                  Navigator.pop(ctx);
+                  context.pop();
                 },
                 child: Text("OKAY"),
               )
@@ -161,7 +162,7 @@ class _SignUpFormState extends State<SignUpForm> {
             actions: [
               OutlinedButton(
                 onPressed: () {
-                  Navigator.pop(ctx);
+                  context.pop();
                 },
                 child: Text("OKAY"),
               )

@@ -1,10 +1,12 @@
 import 'package:authentication/core/database/database.dart';
-import 'package:authentication/core/helpers/authentication/authentication.dart';
-import 'package:authentication/core/helpers/authentication/authentication_impl.dart';
+import 'package:authentication/core/helpers/biometric_authentication/biometric_authentication.dart';
+import 'package:authentication/core/helpers/biometric_authentication/biometric_authentication_impl.dart';
+import 'package:authentication/core/l10n/l10n.dart';
+import 'package:authentication/core/theme/theme.dart';
 import 'package:authentication/data/repositories/authentication_repository_impl.dart';
 import 'package:authentication/domain/repositories/authentication_repository.dart';
 import 'package:authentication/env.dart';
-import 'package:authentication/presentation/landing/blocs/onboarding_bloc.dart';
+import 'package:authentication/presentation/onboarding/blocs/onboarding_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,12 +17,51 @@ Future<void> initializedApp() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   final sharedPreferences = await SharedPreferences.getInstance();
-  final sp = sl.registerSingleton<SharedPreferences>(sharedPreferences);
+  sl.registerSingleton<SharedPreferences>(sharedPreferences);
 
-  final db = sl.registerSingleton<AppDatabase>(AppDatabase());
-  final auth = sl.registerSingleton<Authentication>(AuthenticationImpl(sp: sp, key: Env.aesKey));
-  final repo = sl.registerSingleton<AuthenticationRepository>(
-      AuthenticationRepositoryImpl(db: db, auth: auth));
+  final defaultTheme =
+      appThemes[Env.defaultThemeData] ?? (light: RoseWoodX.light(), dark: RoseWoodX.dark());
+  final theme = sl
+      .registerSingleton<ThemeCubit>(ThemeCubit(sp: sharedPreferences, defaultTheme: defaultTheme));
+  theme.loadTheme();
 
-  sl.registerFactory<OnboardingBloc>(() => OnboardingBloc(repository: repo));
+  sl.registerSingleton<L10nCubit>(
+    L10nCubit(
+      defaultLocale: Locale('en'),
+      supportedLocales: [
+        Locale('en'),
+        Locale('zh'),
+        Locale('ja'),
+      ],
+    ),
+  );
+
+  _injectHelpers();
+  _injectRepositories();
+  _injectBlocs();
+}
+
+void _injectHelpers() {
+  sl.registerSingleton<AppDatabase>(AppDatabase());
+  sl.registerSingleton<BiometricAuthentication>(
+    BiometricAuthenticationImpl(sp: sl.get<SharedPreferences>(), key: Env.aesKey),
+  );
+}
+
+void _injectRepositories() {
+  sl.registerSingleton<AuthenticationRepository>(
+    AuthenticationRepositoryImpl(db: sl.get<AppDatabase>()),
+  );
+}
+
+void _injectBlocs() {
+  // ! singleton - use BlocProvider.value to not close the stream
+
+  // ! factory - use BlocProvider to create new instance
+  sl.registerFactory<OnboardingBloc>(
+    () => OnboardingBloc(
+      bioAuth: sl.get<BiometricAuthentication>(),
+      repository: sl.get<AuthenticationRepository>(),
+    ),
+  );
 }

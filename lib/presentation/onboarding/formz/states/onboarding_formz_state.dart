@@ -1,5 +1,5 @@
-import 'package:authentication/presentation/landing/formz/inputs/password_input.dart';
-import 'package:authentication/presentation/landing/formz/inputs/username_input.dart';
+import 'package:authentication/presentation/onboarding/formz/inputs/password_input.dart';
+import 'package:authentication/presentation/onboarding/formz/inputs/username_input.dart';
 import 'package:formz/formz.dart';
 
 class OnboardingFormzState with FormzMixin {

@@ -4,4 +4,4 @@ class AuthenticationFailedException extends AuthenticationException {}
 
 class UserAlreadyExistException extends AuthenticationException {}
 
-class CredentialNotFoundException extends AuthenticationException {}
+class CredentialCorruptedException extends AuthenticationException {}

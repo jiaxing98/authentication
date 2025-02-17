@@ -7,14 +7,14 @@ class AesEncryptionImpl extends AesEncryption {
 
   AesEncryptionImpl({
     required String key,
-    IV? iv,
+    required String encodedIV,
     AESMode? mode,
   })  : _encrypter = Encrypter(AES(Key.fromUtf8(key), mode: mode ?? AESMode.sic)),
-        _iv = iv ?? IV.fromLength(16);
+        _iv = IV.fromBase64(encodedIV);
 
   @override
   String decrypt(String encryptedText) {
-    final encrypted = Encrypted.fromBase16(encryptedText);
+    final encrypted = Encrypted.fromBase64(encryptedText);
     return _encrypter.decrypt(encrypted, iv: _iv);
   }
 

@@ -23,8 +23,16 @@ final class OnboardingLoginAccount extends OnboardingEvent {
   });
 }
 
+final class OnboardingIsBiometricEnabled extends OnboardingEvent {}
+
 final class OnboardingSetupBiometricLogin extends OnboardingEvent {
+  final String username;
   final String password;
 
-  OnboardingSetupBiometricLogin({required this.password});
+  OnboardingSetupBiometricLogin({
+    required this.username,
+    required this.password,
+  });
 }
+
+final class OnboardingAuthenticateWithBiometric extends OnboardingEvent {}

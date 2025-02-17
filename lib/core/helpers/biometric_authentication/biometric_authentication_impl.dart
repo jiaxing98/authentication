@@ -1,6 +1,6 @@
 import 'package:authentication/core/exceptions/authentication_exception.dart';
 import 'package:authentication/core/extensions/string_extension.dart';
-import 'package:authentication/core/helpers/authentication/authentication.dart';
+import 'package:authentication/core/helpers/biometric_authentication/biometric_authentication.dart';
 import 'package:authentication/core/helpers/encryption/aes_encryption.dart';
 import 'package:authentication/core/helpers/encryption/aes_encryption_impl.dart';
 import 'package:authentication/env.dart';
@@ -8,7 +8,7 @@ import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class AuthenticationImpl extends Authentication {
+class BiometricAuthenticationImpl extends BiometricAuthentication {
   final _biometricLoginEnabled = "key_biometric_login_enabled";
   final _biometricLoginUsername = "key_biometric_login_username";
   final _biometricLoginPassword = "key_biometric_login_password";
@@ -18,11 +18,11 @@ class AuthenticationImpl extends Authentication {
   final SharedPreferences _sp;
   final AesEncryption _aes;
 
-  AuthenticationImpl({
+  BiometricAuthenticationImpl({
     required SharedPreferences sp,
     required String key,
   })  : _sp = sp,
-        _aes = AesEncryptionImpl(key: Env.aesKey);
+        _aes = AesEncryptionImpl(key: Env.aesKey, encodedIV: Env.encodedIV);
 
   @override
   Future<bool> get canAuthenticateWithBiometrics async =>
@@ -56,15 +56,18 @@ class AuthenticationImpl extends Authentication {
     final encryptedUsername = _sp.getString(_biometricLoginUsername);
     final encryptedPassword = _sp.getString(_biometricLoginPassword);
 
-    // ! use string extensions
     if (encryptedUsername.isNullOrEmpty || encryptedPassword.isNullOrEmpty) {
-      throw CredentialNotFoundException();
+      throw CredentialCorruptedException();
     }
 
-    final username = _aes.decrypt(encryptedUsername!);
-    final password = _aes.decrypt(encryptedPassword!);
+    try {
+      final username = _aes.decrypt(encryptedUsername!);
+      final password = _aes.decrypt(encryptedPassword!);
 
-    return (username: username, password: password);
+      return (username: username, password: password);
+    } catch (ex) {
+      throw CredentialCorruptedException();
+    }
   }
 
   @override
@@ -81,14 +84,14 @@ class AuthenticationImpl extends Authentication {
   }
 
   @override
-  Future<void> enabledBiometricLogin(String password) async {
+  Future<void> enableBiometricLogin(String password) async {
     final encrypted = _aes.encrypt(password);
     await _sp.setString(_biometricLoginPassword, encrypted);
     await _sp.setBool(_biometricLoginEnabled, true);
   }
 
   @override
-  Future<void> disabledBiometricLogin() async {
+  Future<void> disableBiometricLogin() async {
     await _sp.setBool(_biometricLoginEnabled, false);
     await _sp.remove(_biometricLoginPassword);
   }

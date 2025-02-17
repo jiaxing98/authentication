@@ -33,7 +33,7 @@ migrate_working_dir/
 .pub/
 /build/
 *.g.dart
-/lib/.env.json
+/.env
 
 # Symbolication related
 app.*.symbols
