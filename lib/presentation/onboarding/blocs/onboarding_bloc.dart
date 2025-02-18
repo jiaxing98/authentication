@@ -33,11 +33,11 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
       emit(OnboardingLoading());
       await _repository.signup(event.username, event.password);
       emit(OnboardingSignUpSuccess());
-    } on UserAlreadyExistException catch (ex) {
-      log(ex.toString());
+    } on UserAlreadyExistException catch (ex, stacktrace) {
+      log(ex.toString(), stackTrace: stacktrace);
       emit(OnboardingUserAlreadyExist());
-    } catch (ex) {
-      log(ex.toString());
+    } catch (ex, stacktrace) {
+      log(ex.toString(), stackTrace: stacktrace);
       emit(OnboardingUnknownFailure(message: ex.toString()));
     }
   }
@@ -52,11 +52,11 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
       canEnabled
           ? emit(OnboardingAskIfEnableBiometricAuth())
           : emit(OnboardingLoginSuccess(username: event.username));
-    } on AuthenticationFailedException catch (ex) {
-      log(ex.toString());
+    } on AuthenticationFailedException catch (ex, stacktrace) {
+      log(ex.toString(), stackTrace: stacktrace);
       emit(OnboardingLoginFailure());
-    } catch (ex) {
-      log(ex.toString());
+    } catch (ex, stacktrace) {
+      log(ex.toString(), stackTrace: stacktrace);
       emit(OnboardingUnknownFailure(message: ex.toString()));
     }
   }
@@ -75,11 +75,11 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
         await _bioAuth.enableBiometricLogin(event.password);
       }
       emit(OnboardingLoginSuccess(username: event.username));
-    } on CredentialCorruptedException catch (ex) {
-      log(ex.toString());
+    } on CredentialCorruptedException catch (ex, stacktrace) {
+      log(ex.toString(), stackTrace: stacktrace);
       emit(OnboardingCredentialCorrupted());
-    } catch (ex) {
-      log(ex.toString());
+    } catch (ex, stacktrace) {
+      log(ex.toString(), stackTrace: stacktrace);
       emit(OnboardingUnknownFailure(message: ex.toString()));
     }
   }
@@ -93,15 +93,15 @@ class OnboardingBloc extends Bloc<OnboardingEvent, OnboardingState> {
       final credential = await _bioAuth.getCredential();
       await _repository.login(credential.username, credential.password);
       emit(OnboardingLoginSuccess(username: credential.username));
-    } on PlatformException catch (ex) {
+    } on PlatformException catch (ex, stacktrace) {
       /* Do Nothing */
-      log(ex.toString());
-    } on CredentialCorruptedException catch (ex) {
-      log(ex.toString());
+      log(ex.toString(), stackTrace: stacktrace);
+    } on CredentialCorruptedException catch (ex, stacktrace) {
+      log(ex.toString(), stackTrace: stacktrace);
       await _bioAuth.removeAllCaches();
       emit(OnboardingCredentialCorrupted());
-    } catch (ex) {
-      log(ex.toString());
+    } catch (ex, stacktrace) {
+      log(ex.toString(), stackTrace: stacktrace);
       emit(OnboardingUnknownFailure(message: ex.toString()));
     }
   }

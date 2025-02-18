@@ -16,6 +16,8 @@ GetIt sl = GetIt.instance;
 Future<void> initializedApp() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  sl.registerSingleton<AppDatabase>(AppDatabase());
+
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerSingleton<SharedPreferences>(sharedPreferences);
 
@@ -42,9 +44,12 @@ Future<void> initializedApp() async {
 }
 
 void _injectHelpers() {
-  sl.registerSingleton<AppDatabase>(AppDatabase());
   sl.registerSingleton<BiometricAuthentication>(
-    BiometricAuthenticationImpl(sp: sl.get<SharedPreferences>(), key: Env.aesKey),
+    BiometricAuthenticationImpl(
+      sp: sl.get<SharedPreferences>(),
+      key: Env.aesKey,
+      encodedIV: Env.encodedIV,
+    ),
   );
 }
 

@@ -3,7 +3,6 @@ import 'package:authentication/core/extensions/string_extension.dart';
 import 'package:authentication/core/helpers/biometric_authentication/biometric_authentication.dart';
 import 'package:authentication/core/helpers/encryption/aes_encryption.dart';
 import 'package:authentication/core/helpers/encryption/aes_encryption_impl.dart';
-import 'package:authentication/env.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,8 +20,9 @@ class BiometricAuthenticationImpl extends BiometricAuthentication {
   BiometricAuthenticationImpl({
     required SharedPreferences sp,
     required String key,
+    required String encodedIV,
   })  : _sp = sp,
-        _aes = AesEncryptionImpl(key: Env.aesKey, encodedIV: Env.encodedIV);
+        _aes = AesEncryptionImpl(key: key, encodedIV: encodedIV);
 
   @override
   Future<bool> get canAuthenticateWithBiometrics async =>
