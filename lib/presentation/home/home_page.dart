@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 Text("Welcome,"),
                 Text(
@@ -83,14 +83,19 @@ class _HomePageState extends State<HomePage> {
                 ),
                 Expanded(
                   child: Column(
+                    spacing: 24.0,
                     mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: <Widget>[
-                      Text(context.l10n.counterMessage),
+                      Text(
+                        context.l10n.counterMessage,
+                        textAlign: TextAlign.center,
+                      ),
                       Text(
                         '$_counter',
+                        textAlign: TextAlign.center,
                         style: Theme.of(context).textTheme.headlineMedium,
                       ),
-                      SizedBox(height: 24.0),
                       OutlinedButton(
                         onPressed: _incrementCounter,
                         child: Text(context.l10n.incrementButton),
