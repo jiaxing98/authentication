@@ -1,8 +1,12 @@
-# authentication
+# authentication_demo
 
-A new Flutter project.
+A new Flutter project with Biometric Authentication Login.
 
 ## Getting Started
+
+Create a env.json with the following variables:
+1. AES_KEY - 16, 24, or 32 length
+2. ENCODED_IV - Exactly 16 length
 
 This project is a starting point for a Flutter application.
 

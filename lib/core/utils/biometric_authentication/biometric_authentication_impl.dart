@@ -1,8 +1,8 @@
 import 'package:authentication/core/exceptions/authentication_exception.dart';
 import 'package:authentication/core/extensions/string_extension.dart';
-import 'package:authentication/core/helpers/biometric_authentication/biometric_authentication.dart';
-import 'package:authentication/core/helpers/encryption/aes_encryption.dart';
-import 'package:authentication/core/helpers/encryption/aes_encryption_impl.dart';
+import 'package:authentication/core/utils/biometric_authentication/biometric_authentication.dart';
+import 'package:authentication/core/utils/encryption/aes_encryption.dart';
+import 'package:authentication/core/utils/encryption/aes_encryption_impl.dart';
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';

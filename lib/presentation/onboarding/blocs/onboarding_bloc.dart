@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:authentication/core/exceptions/authentication_exception.dart';
-import 'package:authentication/core/helpers/biometric_authentication/biometric_authentication.dart';
+import 'package:authentication/core/utils/biometric_authentication/biometric_authentication.dart';
 import 'package:authentication/domain/repositories/authentication_repository.dart';
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';

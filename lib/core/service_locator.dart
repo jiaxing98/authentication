@@ -1,8 +1,8 @@
 import 'package:authentication/core/database/database.dart';
-import 'package:authentication/core/helpers/biometric_authentication/biometric_authentication.dart';
-import 'package:authentication/core/helpers/biometric_authentication/biometric_authentication_impl.dart';
 import 'package:authentication/core/l10n/l10n.dart';
 import 'package:authentication/core/theme/theme.dart';
+import 'package:authentication/core/utils/biometric_authentication/biometric_authentication.dart';
+import 'package:authentication/core/utils/biometric_authentication/biometric_authentication_impl.dart';
 import 'package:authentication/data/repositories/authentication_repository_impl.dart';
 import 'package:authentication/domain/repositories/authentication_repository.dart';
 import 'package:authentication/env.dart';
